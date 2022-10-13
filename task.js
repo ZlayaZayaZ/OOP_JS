@@ -101,7 +101,6 @@ class BasketGood extends Good {
     constructor(id, name, description, sizes, price, available, amount) {
         super (id, name, description, sizes, price, available);
         this.amount = amount;
-
     }
 
   }
@@ -113,40 +112,34 @@ class Basket {
         this.goods = []
     }
 
-    add2 (good, amount) {
-        if (good.available == true) {
-		this.goods.push(good);
-        }
-	}
-
-    add (good, amount) {
-        if (this.goods.indexOf(good)!=-1) {
-            let index = this.goods.indexOf(good)
-            this.goods[index].amount = goods[index].amount + amount
+    add (basketGood, amount) {
+        if (this.goods.indexOf(basketGood)!=-1) {
+            let index = this.goods.indexOf(basketGood)
+            this.goods[index].amount = this.goods[index].amount + amount
             return this.goods
         } else {
-            good.amount = amount
-            console.log(good)
-            this.goods.push(good)
+            this.goods.push(basketGood)
             return this.goods
         }
     }
 
     remove(good, amount) {
         if (this.goods.indexOf(good)!=-1) {
-            let index = this.goods.findindex(good)
+            let index = this.goods.indexOf(good)
             this.goods[index].amount = this.goods[index].amount - amount
             if (this.goods[index].amount == 0) {
-                goods.splice(index, 1)
+                this.goods.splice(index, 1)
             }
         }
     }
+
     clear() {
         this.goods = []
+        return this.goods
     }
 
     removeUnavailable() {
-        let result = goods.filter(good => good.available == true);
+        let result = this.goods.filter(good => good.available == true);
         return result
     }
 
@@ -155,26 +148,17 @@ class Basket {
     }
 
     get totalAmount() {
-        var totalAmount = 0;
-        var index, len;
-        for (index = 0, len = goods.length; index < len; ++index) {
-            totalAmount = totalAmount + goods[index].amount;
-        }
+        let totalAmount = 0
+        const sumAmount = this.goods.reduce(
+        (totalAmount, good) => totalAmount + good.amount, totalAmount);
+        return sumAmount
     }
 
     get totalSum() {
-        var totalSumm = 0;
-        var index, len;
-        for (index = 0, len = goods.length; index < len; ++index) {
-            totalSumm = totalSumm + goods[index].good.price * goods[index].amount
-        }
-    }
-
-    get totalSummmm() {
-        var totalSumm = 0;
-        const sumWithInitial = goods.reduce(
-        (totalSumm, good) => totalSumm + good.price * good.amount, totalSumm);
-        console.log(sumWithInitial);
+        let totalSum = 0
+        const sumPrice = this.goods.reduce(
+        (totalSum, good) => totalSum + good.price * good.amount, totalSum);
+        return sumPrice
     }
     }
   
@@ -192,16 +176,31 @@ goodsList.add(good4)
 goodsList.add(good5)
 // console.log(goodsList.remoteOf(3))
 // console.log(goodsList.list)
+good5.setAvailable(false)
 
-let basketGood2 = new BasketGood(good2, 2)
-let basketGood1 = new BasketGood(good1, 1)
-let basketGood5 = new BasketGood(good5, 1)
-console.log(basketGood2)
+let basketGood2 = new BasketGood(good2.id, good2.name, good2.description, good2.sizes, good2.price, good2.available, 2)
+let basketGood1 = new BasketGood(good1.id, good1.name, good1.description, good1.sizes, good1.price, good1.available, 1)
+let basketGood5 = new BasketGood(good5.id, good5.name, good5.description, good5.sizes, good5.price, good5.available, 1)
+// console.log(basketGood2)
+// console.log(basketGood5)
 
 let basket = new Basket()
-basket.add(basketGood2)
-basket.add(basketGood1)
-basket.add(basketGood5)
+basket.add(basketGood2, 1)
+basket.add(basketGood1, 1)
+basket.add(basketGood5, 1)
+basket.add(basketGood2, 1)
+//console.log(basket.list)
+// console.log(basket.clear())
 // console.log(basket.list)
 
+// basket.remove(basketGood5, 1)
+//basket.remove(basketGood2, 2)
+//console.log(basket.list)
 
+
+basket.add(basketGood5, 1)
+console.log(basket.list)
+//console.log(basket.removeUnavailable())
+
+console.log(basket.totalAmount)
+console.log(basket.totalSum)
