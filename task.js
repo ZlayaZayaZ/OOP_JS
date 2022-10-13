@@ -15,44 +15,64 @@ class Good {
   
   }
 
-class GoodsList extends Good {
+class GoodsList {
     good
 	#goods
 
 	constructor(sortPrice, sortDir) {
-        // проблема в этом месте. Если оставить строчку ниже в конструкторе
-        // данного класса - получается что мы каждый раз при создании нового объекта
-        // данного класса будем ловить ошибку, что он не понимает зачем нам нужны эти
-        // параметры и какие конкретно брать, если объектов предыдущего класса - несколько
 
-        // а если убрать эту строчку - то node ругается, что ему "не с чем работать"
-        // внутри методов класса. Не понимаю куда ее перенести, чтобы все работало
-        // (по сути эта проблема так же касается всех методов ниже)
-        good = super(id, name, description, sizes, price, available)
         this.#goods = []
-        let filter = /брюки/gmi
-        let result = []
-        for (let good in this.#goods) {
-            if (filter.test(good.name)) {
-                result.push(good) 
-            }
-        }
-        //let result = #goods.filter(good.name => filter.test(good.name));
         this.sortPrice = sortPrice
         this.sortDir = sortDir
     }
 
     get list() {
+        let result = []
+        let filter = /брюки/gi
+
+        for (let good of this.#goods) {
+
+            if (filter.test(good.name)) {
+                result.push(good) 
+                // в этом месте творится тайная магия, так как при запуске программы
+                // без <console.log(filter.test(good.name))> внутри этого условия - 
+                // в массив result добавляется только первое встреченное значение 
+                // подходящие под условие, а с этой строчкой - все встреченные
+                console.log(filter.test(good.name))
+            }
+        }
+        console.log(result)
+        let resultSort = result.slice().sort()
         if (this.sortPrice == true) {
             if (this.sortDir == true) {
-                result.price.sort = 1
-                return result
+                resultSort.sort(function(a, b){
+                    var c = a.price,
+                        d = b.price;
+
+                    if( c < d ){
+                        return -1;
+                    }else if( c > d ){
+                        return 1;
+                    }
+                    return 0;
+                })
+                return resultSort
             } else {
-                result.price.sort = -1
-                return result
+                resultSort.sort(function(a, b){
+                    var c = a.price,
+                        d = b.price;
+                
+                    if( c < d ){
+                        return 1;
+                    }else if( c > d ){
+                        return -1;
+                    }
+                    return 0;
+                })
+                return resultSort
             } 
         } else {
-            result
+            resultSort
         }
     }
 
@@ -62,45 +82,56 @@ class GoodsList extends Good {
         }
 	}
 
-	remote (id) {
-		for (let good of this.#goods) {
-            let index = this.#goods.findindex(good.id == id)
-            if (index == -1) {
-                console.log('елемент не найден')
-            } else {
-                this.#goods.splice(index, 1)
-                return this.#goods
-            }
+    remote (id) {
+        let idIndex = []
+        for (let good of this.#goods) {
+            idIndex.push(good.id)
+        }
+        let index = idIndex.indexOf(id);
+        if (index >= 0) {
+        this.#goods.splice(index, 1);
+        return this.#goods
+    }
+    }
 
-		}
-	}
 }
 
 class BasketGood extends Good {
-    good
-    goods
 
     constructor(id, name, description, sizes, price, available, amount) {
-        good = super (id, name, description, sizes, price, available)
+        super (id, name, description, sizes, price, available);
         this.amount = amount;
-        goods = []
+
     }
 
-    add(good, amount) {
+  }
+
+class Basket {
+    goods
+
+    constructor() {
+        this.goods = []
+    }
+
+    add2 (good, amount) {
+        if (good.available == true) {
+		this.goods.push(good);
+        }
+	}
+
+    add (good, amount) {
         if (this.goods.indexOf(good)!=-1) {
-            let index = this.goods.findindex(good)
+            let index = this.goods.indexOf(good)
             this.goods[index].amount = goods[index].amount + amount
+            return this.goods
         } else {
-            this.goods.push(id = good.id,
-                name = good.name,
-                description = good.description,
-                sizes = good.sizes,
-                price = good.price,
-                available  = good.available,
-                amount = amount,
-                )
+            good.amount = amount
+            console.log(good)
+            this.goods.push(good)
+            return this.goods
         }
     }
+
     remove(good, amount) {
         if (this.goods.indexOf(good)!=-1) {
             let index = this.goods.findindex(good)
@@ -119,13 +150,8 @@ class BasketGood extends Good {
         return result
     }
 
-  }
-
-class Basket extends BasketGood {
-    goods
-
-    constructor() {
-        goods = super(goods)
+    get list() {
+        return this.goods
     }
 
     get totalAmount() {
@@ -158,10 +184,24 @@ let good3 = new Good(3, "брюки", "мужские, классические"
 let good4 = new Good(4, "брюки", "мужские, джинсы", [40, 42, 44, 46, 48], 4500, true)
 let good5 = new Good(5, "рубашка", "в ассортименте", [40, 44, 50], 4000, true)
 
-let goodsList = new GoodsList(true, false)
+let goodsList = new GoodsList(true, true)
 goodsList.add(good1)
 goodsList.add(good2)
 goodsList.add(good3)
 goodsList.add(good4)
 goodsList.add(good5)
-console.log(goodsList.list)
+// console.log(goodsList.remoteOf(3))
+// console.log(goodsList.list)
+
+let basketGood2 = new BasketGood(good2, 2)
+let basketGood1 = new BasketGood(good1, 1)
+let basketGood5 = new BasketGood(good5, 1)
+console.log(basketGood2)
+
+let basket = new Basket()
+basket.add(basketGood2)
+basket.add(basketGood1)
+basket.add(basketGood5)
+// console.log(basket.list)
+
+
